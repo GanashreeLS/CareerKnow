@@ -1,0 +1,109 @@
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  Box,
+} from "@mui/material";
+//import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Link } from "react-router-dom";
+import { isLoggedIn } from "../../utils/auth";
+
+const Header = () => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [auth, setAuth] = useState(false);
+
+  useEffect(() => {
+    setAuth(isLoggedIn());
+  }, []);
+
+  const handleServicesClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleServicesClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
+      <Toolbar>
+        {/* Project Name */}
+        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
+          CarrerKnow
+        </Typography>
+
+        {/* Navigation Tabs */}
+        {auth && (
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button component={Link} to="/" color="inherit">
+              Home
+            </Button>
+
+            {/* Services Dropdown */}
+            <Button
+              color="inherit"
+              // endIcon={<ArrowDropDownIcon />}
+              onClick={handleServicesClick}
+            >
+              Services
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleServicesClose}
+            >
+              <MenuItem
+                component={Link}
+                to="/services"
+                onClick={handleServicesClose}
+              >
+                Resume Building
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                to="/services"
+                onClick={handleServicesClose}
+              >
+                Career Counselling
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                to="/services"
+                onClick={handleServicesClose}
+              >
+                Mock Interviews
+              </MenuItem>
+            </Menu>
+
+            <Button component={Link} to="/contact" color="inherit">
+              Contact
+            </Button>
+            <Button component={Link} to="/quiz" color="inherit">
+              Quiz
+            </Button>
+            <Button component={Link} to="/testimonials" color="inherit">
+              Testimonials
+            </Button>
+
+            {!auth && (
+              <Button
+                component={Link}
+                to="/auth"
+                color="inherit"
+                variant="outlined"
+              >
+                Login / Register
+              </Button>
+            )}
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default Header;
