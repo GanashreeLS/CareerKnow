@@ -8,6 +8,7 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
+
 //import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Link } from "react-router-dom";
 import { isLoggedIn } from "../../utils/auth";
@@ -32,8 +33,12 @@ const Header = () => {
     <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
       <Toolbar>
         {/* Project Name */}
+        <Box>
+        <img src={`${process.env.PUBLIC_URL}/images/logo.jpg`} alt="Carrer Caper" width="140px"/>
+        </Box>
+       
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-          CarrerKnow
+          CAREER CAPER
         </Typography>
 
         {/* Navigation Tabs */}
