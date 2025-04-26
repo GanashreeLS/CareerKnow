@@ -15,7 +15,8 @@ import { isLoggedIn } from "./utils/auth";
 import Auth from "./components/pages/Auth";
 
 function App() {
-  const [auth, setAuth] = useState(false);// boolean true or false
+  const [auth, setAuth] = useState(false); // boolean true or false
+  //const navigate = useNavigate();
 
   useEffect(() => {
     setAuth(isLoggedIn());
@@ -38,7 +39,7 @@ function App() {
             <Route path="/testimonials" element={<Testimonials />} />
           </>
         )}
-        {!auth && <Route path="*" element={<Auth />} />}
+        {!auth && <Route path="*" element={<Home />} />}
       </Routes>
     </Router>
   );

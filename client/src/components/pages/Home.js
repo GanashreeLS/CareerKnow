@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography, Box, Paper } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth");
+    }
+  }, [navigate]);
+
   const items = [
     {
       name: "Random Name #1",
