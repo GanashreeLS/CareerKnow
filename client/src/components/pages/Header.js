@@ -11,15 +11,22 @@ import {
 
 //import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Link } from "react-router-dom";
-import { isLoggedIn } from "../../utils/auth";
+import { isLoggedIn, logout } from "../../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [auth, setAuth] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setAuth(isLoggedIn());
   }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
 
   const handleServicesClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -34,9 +41,13 @@ const Header = () => {
       <Toolbar>
         {/* Project Name */}
         <Box>
-        <img src={`${process.env.PUBLIC_URL}/images/logo.jpg`} alt="Carrer Caper" width="140px"/>
+          <img
+            src={`${process.env.PUBLIC_URL}/images/logo.jpg`}
+            alt="Carrer Caper"
+            width="140px"
+          />
         </Box>
-       
+
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: "bold" }}>
           CAREER CAPER
         </Typography>
@@ -94,7 +105,7 @@ const Header = () => {
               Testimonials
             </Button>
 
-            {!auth && (
+            {!auth ? (
               <Button
                 component={Link}
                 to="/auth"
@@ -102,6 +113,10 @@ const Header = () => {
                 variant="outlined"
               >
                 Login / Register
+              </Button>
+            ) : (
+              <Button onClick={handleLogout} color="inherit" variant="outlined">
+                Logout
               </Button>
             )}
           </Box>
