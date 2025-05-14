@@ -60,6 +60,22 @@ const Home = () => {
           </Paper>
         ))}
       </Carousel>
+      <Box>
+        <Typography variant="h4">About Career Caper</Typography>
+        <Typography variant="p">
+          Education seekers get a personalised experience on our site, based on
+          educational background and career interest, enabling them to make well
+          informed course and career decisions. The decision making is empowered
+          with easy access to detailed information on career choices, courses,
+          exams, colleges, admission criteria, eligibility, placement
+          statistics, rankings, reviews, scholarships, latest updates etc as
+          well as by interacting with other career.ly users, experts, current
+          students in colleges and alumni groups. We have introduced several
+          student oriented products and tools like Career Prediction, Knowledge
+          Network, Daily Bytes, Blogs, Community discussion forum, and various
+          Courses.
+        </Typography>
+      </Box>
     </Box>
   );
 };

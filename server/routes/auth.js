@@ -30,7 +30,6 @@ router.post("/register", async (req, res) => {
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully" });
-
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -47,7 +46,8 @@ router.post("/login", async (req, res) => {
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     // Sign JWT
     const token = jwt.sign(
@@ -56,12 +56,10 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token });
-
+    res.status(200).json({ token, role: user.role });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
 module.exports = router;
-

@@ -11,7 +11,7 @@ import {
 
 //import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Link } from "react-router-dom";
-import { isLoggedIn, logout } from "../../utils/auth";
+import { isLoggedIn, logout, isUser, isAdmin } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
@@ -74,53 +74,54 @@ const Header = () => {
             >
               <MenuItem
                 component={Link}
-                to="/services"
+                to="/resumebuilder"
                 onClick={handleServicesClose}
               >
                 Resume Building
               </MenuItem>
               <MenuItem
                 component={Link}
-                to="/services"
+                to="/courselist"
                 onClick={handleServicesClose}
               >
-                Career Counselling
+                Populor Courses
               </MenuItem>
               <MenuItem
                 component={Link}
-                to="/services"
+                to="/interviewfaqs"
                 onClick={handleServicesClose}
               >
-                Mock Interviews
+                FAQ Interview Questions
               </MenuItem>
             </Menu>
-
+            {/* 
             <Button component={Link} to="/contact" color="inherit">
               Contact
+            </Button> */}
+            <Button component={Link} to="/recommendation" color="inherit">
+              Recommendation
             </Button>
-            <Button component={Link} to="/quiz" color="inherit">
-              Quiz
-            </Button>
-            <Button component={Link} to="/testimonials" color="inherit">
+            {/* <Button component={Link} to="/testimonials" color="inherit">
               Testimonials
-            </Button>
-
-            {!auth ? (
-              <Button
-                component={Link}
-                to="/auth"
-                color="inherit"
-                variant="outlined"
-              >
-                Login / Register
-              </Button>
-            ) : (
-              <Button onClick={handleLogout} color="inherit" variant="outlined">
-                Logout
-              </Button>
-            )}
+            </Button> */}
           </Box>
         )}
+        <Box>
+          {!auth ? (
+            <Button
+              component={Link}
+              to="/auth"
+              color="inherit"
+              variant="outlined"
+            >
+              Login / Register
+            </Button>
+          ) : (
+            <Button onClick={handleLogout} color="inherit" variant="outlined">
+              Logout 
+            </Button>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );

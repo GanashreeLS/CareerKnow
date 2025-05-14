@@ -7,7 +7,7 @@ const Services = () => {
       <ul>
         <li>Resume Building</li>
         <li>Career Counselling</li>
-        <li>Mock Interviews</li>
+        <li>FAQ Interview Questions</li>
       </ul>
     </div>
   );
