@@ -80,7 +80,12 @@ const Auth = () => {
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
-        navigate("/"); // Redirect to home
+        if (data.role === "user") {
+          navigate("/");
+        } else if (data.role === "admin") {
+          navigate("/admin");
+        }
+        // Redirect to home
       } else {
         alert(data.message || "Authentication failed.");
       }

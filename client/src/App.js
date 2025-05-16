@@ -12,14 +12,17 @@ import Services from "./components/pages/Services";
 import Header from "./components/pages/Header";
 
 import { Paper, Container, Box } from "@mui/material";
-import { isLoggedIn } from "./utils/auth";
+import { isLoggedIn, isAdmin, isUser } from "./utils/auth";
 import Auth from "./components/pages/Auth";
 import ResumeBuilder from "./components/pages/ResumeBuilder";
 import InterviewQuestions from "./components/pages/InterviewQuestions";
 import CourseList from "./components/pages/CourseList";
+import AdminHome from "./components/pages/AdminHome";
 
 function App() {
   const [auth, setAuth] = useState(false); // boolean true or false
+
+  console.log(isAdmin());
   //const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,10 +31,11 @@ function App() {
 
   return (
     <Router>
-      {auth && <Header />}
+      {auth && isUser() && <Header />}
       <Routes>
+        {isAdmin() && <Route path="/admin" element={<AdminHome />} />}
         <Route path="/auth" element={<Auth />} />
-        {auth && (
+        {auth && isUser() && (
           <>
             <Route path="/" element={<Home />} />
             <Route path="/recommendation" element={<Recommend />} />

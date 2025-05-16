@@ -1,0 +1,42 @@
+import { useState } from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import AddFaq from "./AddFaq";
+
+export default function AdminHome() {
+  const [view, setView] = useState("home");
+
+  return (
+    <Box>
+      <AppBar position="static">
+        <Toolbar>
+          <Box>
+            <img
+              src={`${process.env.PUBLIC_URL}/images/logo.jpg`}
+              alt="Carrer Caper"
+              width="140px"
+            />
+          </Box>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Admin Panel
+          </Typography>
+          <Button color="inherit" onClick={() => setView("home")}>
+            Home
+          </Button>
+          <Button color="inherit" onClick={() => setView("add-faq")}>
+            Add FAQs
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      <Box p={3} maxWidth="800px" mx="auto">
+        {view === "home" && (
+          <Typography variant="h4" mt={3} textAlign="center">
+            Welcome to Admin Dashboard
+          </Typography>
+        )}
+
+        {view === "add-faq" && <AddFaq />}
+      </Box>
+    </Box>
+  );
+}

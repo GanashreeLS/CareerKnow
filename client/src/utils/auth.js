@@ -7,9 +7,10 @@ export const logout = async () => {
 };
 
 export const isUser = () => {
-  return !!localStorage.getItem("role") === "user";
+  return localStorage.getItem("role") === "user";
 };
 
 export const isAdmin = () => {
-  return !!localStorage.getItem("role") === "admin";
+  console.log(localStorage.getItem("role"));
+  return localStorage.getItem("role") === "admin";
 };
