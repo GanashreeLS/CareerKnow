@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import AddFaq from "./AddFaq";
-
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../utils/auth";
 export default function AdminHome() {
   const [view, setView] = useState("home");
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
 
   return (
     <Box>
@@ -24,6 +31,9 @@ export default function AdminHome() {
           </Button>
           <Button color="inherit" onClick={() => setView("add-faq")}>
             Add FAQs
+          </Button>
+          <Button onClick={handleLogout} color="inherit" variant="outlined">
+            Logout
           </Button>
         </Toolbar>
       </AppBar>

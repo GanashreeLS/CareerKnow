@@ -20,4 +20,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const faqs = await Faq.find();
+    res.json(faqs);
+  } catch (error) {
+    console.error("Error fetching FAQs:", error);
+    res.status(500).json({ error: "Failed to fetch FAQs" });
+  }
+});
+
+router.get("/:technology", async (req, res) => {
+  try {
+    const technology = req.params.technology;
+    const faqs = await Faq.find({
+      technology: new RegExp(`^${technology}$`, "i"),
+    }); // case-insensitive
+    res.json(faqs);
+  } catch (error) {
+    console.error("Error fetching filtered FAQs:", error);
+    res.status(500).json({ error: "Failed to fetch FAQs" });
+  }
+});
 module.exports = router;
