@@ -149,8 +149,12 @@ const ResumeBuilder = () => {
   };
 
   return (
-    <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ textAlign: "center", padding: "0.5em" }}
+      >
         Resume Builder
       </Typography>
 

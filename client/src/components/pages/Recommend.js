@@ -36,8 +36,12 @@ function Recommend() {
   // useEffect(() => { alert("component loaded")}, []);
 
   return (
-    <Container sx={{ width: "60em" }}>
-      <Typography variant="h4">Career Recommendations</Typography>
+    <Container
+      sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}
+    >
+      <Typography variant="h4" sx={{ textAlign: "center", padding: "0.5em" }}>
+        Career Recommendations
+      </Typography>
 
       {/* <TextField label="Interests" fullWidth margin="normal" onChange={e => setAnswers({ ...answers, interest: e.target.value })} /> */}
 
@@ -55,7 +59,6 @@ function Recommend() {
           >
             <MenuItem value={"Development"}>Software Development</MenuItem>
             <MenuItem value={"Testing"}>Testing</MenuItem>
-            <MenuItem value={"Data Science"}>Data Science</MenuItem>
             <MenuItem value={"Cybersecurity"}>Cybersecurity</MenuItem>
             <MenuItem value={"Digital Marketing"}>Digital Marketing</MenuItem>
             <MenuItem value={"Project Management"}>Project Management</MenuItem>
@@ -89,7 +92,7 @@ function Recommend() {
           >
             <MenuItem value={"java"}>Java</MenuItem>
             <MenuItem value={"sql"}>SQL</MenuItem>
-            <MenuItem value={"python"}>PYTHON</MenuItem>
+            <MenuItem value={"python"}>Python</MenuItem>
           </Select>
         </FormControl>
 
@@ -118,11 +121,8 @@ function Recommend() {
               setAnswers({ ...answers, location: e.target.value })
             }
           >
-            <MenuItem value={"Bangalore"}>Bangalore</MenuItem>
-            <MenuItem value={"Mysore"}>Mysore</MenuItem>
+            <MenuItem value={"Bengaluru"}>Bengaluru</MenuItem>
             <MenuItem value={"Chennai"}>Chennai</MenuItem>
-            <MenuItem value={"Mumbai"}>Mumbai</MenuItem>
-            <MenuItem value={"Noida"}>Noida</MenuItem>
             <MenuItem value={"Hyderabad"}>Hyderabad</MenuItem>
           </Select>
         </FormControl>
@@ -138,7 +138,7 @@ function Recommend() {
             }
           >
             <MenuItem value={"Hybrid"}>Hybrid</MenuItem>
-            <MenuItem value={"On-Site"}>On Site</MenuItem>
+            <MenuItem value={"On Site"}>On Site</MenuItem>
             <MenuItem value={"Remote"}>Remote</MenuItem>
           </Select>
         </FormControl>

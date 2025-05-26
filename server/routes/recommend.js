@@ -6,7 +6,7 @@ router.post("/", async (req, res) => {
   const { interest, skills, salary, worktype, location } = req.body;
   console.log(req.body);
   const results = await Career.find({
-    // tags: { $in: [interest, skills] },
+    tags: { $in: [interest, skills] },
     salary,
     worktype,
     location,

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -222,8 +223,20 @@ const FAQInterview = () => {
   }, []);
 
   return (
-    <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box
+      sx={{
+        maxWidth: 700,
+        mx: "auto",
+        mt: 4,
+        p: 3,
+        bgcolor: "white",
+      }}
+    >
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ textAlign: "center", padding: "0.5em" }}
+      >
         Interview FAQ
       </Typography>
 

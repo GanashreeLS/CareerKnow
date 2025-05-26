@@ -13,11 +13,14 @@ import {
 import { Link } from "react-router-dom";
 import { isLoggedIn, logout, isUser, isAdmin } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../AuthContext";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [auth, setAuth] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
     setAuth(isLoggedIn());
@@ -25,6 +28,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
+    setIsAuthenticated(false);
     navigate("/auth");
   };
 
@@ -53,7 +57,7 @@ const Header = () => {
         </Typography>
 
         {/* Navigation Tabs */}
-        {auth && (
+        {isAuthenticated && (
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button component={Link} to="/" color="inherit">
               Home
@@ -84,7 +88,7 @@ const Header = () => {
                 to="/courselist"
                 onClick={handleServicesClose}
               >
-                Populor Courses
+                Popular Courses
               </MenuItem>
               <MenuItem
                 component={Link}
@@ -104,10 +108,13 @@ const Header = () => {
             {/* <Button component={Link} to="/testimonials" color="inherit">
               Testimonials
             </Button> */}
+            <Button onClick={handleLogout} color="inherit" variant="outlined">
+              Logout
+            </Button>
           </Box>
         )}
-        <Box>
-          {!auth ? (
+        {/* <Box>
+          {!isAuthenticated ? (
             <Button
               component={Link}
               to="/auth"
@@ -117,11 +124,9 @@ const Header = () => {
               Login / Register
             </Button>
           ) : (
-            <Button onClick={handleLogout} color="inherit" variant="outlined">
-              Logout 
-            </Button>
+           
           )}
-        </Box>
+        </Box> */}
       </Toolbar>
     </AppBar>
   );

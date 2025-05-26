@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import AddFaq from "./AddFaq";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../utils/auth";
+import { logout } from "../../../utils/auth";
+import UserList from "./UserList";
 export default function AdminHome() {
   const [view, setView] = useState("home");
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
     navigate("/auth");
   };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/users");
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <Box>
@@ -32,6 +47,9 @@ export default function AdminHome() {
           <Button color="inherit" onClick={() => setView("add-faq")}>
             Add FAQs
           </Button>
+          <Button color="inherit" onClick={() => setView("user-list")}>
+            Manage Users
+          </Button>
           <Button onClick={handleLogout} color="inherit" variant="outlined">
             Logout
           </Button>
@@ -46,6 +64,8 @@ export default function AdminHome() {
         )}
 
         {view === "add-faq" && <AddFaq />}
+
+        {view === "user-list" && <UserList />}
       </Box>
     </Box>
   );

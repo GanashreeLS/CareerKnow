@@ -46,8 +46,12 @@ const CourseList = () => {
   const [selectedTech, setSelectedTech] = useState("Java");
 
   return (
-    <Box sx={{ maxWidth: 1100, mx: "auto", mt: 4, p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ maxWidth: 1100, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ textAlign: "center", padding: "0.5em" }}
+      >
         Popular YouTube Courses
       </Typography>
 

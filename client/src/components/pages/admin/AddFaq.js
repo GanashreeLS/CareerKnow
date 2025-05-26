@@ -48,7 +48,7 @@ export default function AddFaq() {
   };
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 700, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}>
       <Typography variant="h5" mb={2}>
         Add FAQs
       </Typography>

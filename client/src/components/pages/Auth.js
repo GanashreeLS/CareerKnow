@@ -7,17 +7,30 @@ import {
   Typography,
   Link,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../AuthContext";
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthContext);
   const [isRegister, setIsRegister] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
+    firstname: "",
+    lastname: "",
     email: "",
     password: "",
   });
+  const [passwordError, setPasswordError] = useState(false);
+  const [helperText, setHelperText] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [emailHelper, setEmailHelper] = useState("");
 
@@ -54,11 +67,30 @@ const Auth = () => {
 
   const toggleMode = () => {
     setIsRegister((prev) => !prev);
-    setFormData({ username: "", email: "", password: "" });
+    setFormData({
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+    });
+  };
+
+  const handleDialogClose = () => {
+    setSuccessDialogOpen(false);
+    navigate("/login");
   };
 
   const handleChange = (e) => {
+    const value = e.target.value;
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+    if (!passwordRegex.test(value)) {
+      setPasswordError(true);
+      setHelperText("Min 8 chars with upper, lower, number & special char");
+    } else {
+      setPasswordError(false);
+      setHelperText("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,8 +110,10 @@ const Auth = () => {
       const data = await res.json();
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
+        localStorage.setItem("token", data.token);
+        setIsAuthenticated(true); // ← triggers Header re-render
+
         if (data.role === "user") {
           navigate("/");
         } else if (data.role === "admin") {
@@ -87,7 +121,11 @@ const Auth = () => {
         }
         // Redirect to home
       } else {
-        alert(data.message || "Authentication failed.");
+        if (isRegister) {
+          setSuccessDialogOpen(true);
+        } else {
+          alert(data.message || "Authentication failed.");
+        }
       }
     } catch (err) {
       console.error(err);
@@ -128,15 +166,26 @@ const Auth = () => {
             }}
           >
             {isRegister && (
-              <TextField
-                margin="normal"
-                fullWidth
-                label="Full Name"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
+              <>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  label="First Name"
+                  name="firstname"
+                  value={formData?.firstname}
+                  onChange={handleChange}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  label="Last Name"
+                  name="lastname"
+                  value={formData?.lastname}
+                  onChange={handleChange}
+                  required
+                />
+              </>
             )}
 
             <TextField
@@ -161,6 +210,8 @@ const Auth = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              error={passwordError}
+              helperText={helperText}
             />
 
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
@@ -182,6 +233,20 @@ const Auth = () => {
             </Typography>
           </Box>
         </Paper>
+
+        <Dialog open={successDialogOpen} onClose={handleDialogClose}>
+          <DialogTitle>Registration Successful</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Thank you for registering! Redirecting to login page...
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} autoFocus>
+              Go to Login
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </Box>
   );
