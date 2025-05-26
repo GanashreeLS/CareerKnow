@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/pages/Home";
 import Recommend from "./components/pages/Recommend";
@@ -17,10 +17,11 @@ import InterviewQuestions from "./components/pages/InterviewQuestions";
 import CourseList from "./components/pages/CourseList";
 import AdminHome from "./components/pages/admin/AdminHome";
 import { Container } from "@mui/material";
+import { AuthContext } from "./AuthContext";
 
 function App() {
   const [auth, setAuth] = useState(false); // boolean true or false
-
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
   useEffect(() => {
     setAuth(isLoggedIn());
   }, []);
@@ -32,7 +33,7 @@ function App() {
         <Routes>
           {isAdmin() && <Route path="/admin" element={<AdminHome />} />}
           <Route path="/auth" element={<Auth />} />
-          {auth && (
+          {isAuthenticated && (
             <>
               <Route path="/" element={<Home />} />
               <Route path="/recommendation" element={<Recommend />} />
@@ -47,7 +48,7 @@ function App() {
               {/* <Route path="/testimonials" element={<Testimonials />} /> */}
             </>
           )}
-          {!auth && <Route path="*" element={<Home />} />}
+          {!isAuthenticated && <Route path="*" element={<Home />} />}
         </Routes>
       </Router>
     </div>

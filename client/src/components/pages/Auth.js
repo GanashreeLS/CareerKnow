@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Container,
   Box,
@@ -13,14 +13,15 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../../AuthContext";
+
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Auth = () => {
   const navigate = useNavigate();
   const { setIsAuthenticated } = useContext(AuthContext);
+
   const [isRegister, setIsRegister] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,10 +30,12 @@ const Auth = () => {
     email: "",
     password: "",
   });
+
   const [passwordError, setPasswordError] = useState(false);
   const [helperText, setHelperText] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [emailHelper, setEmailHelper] = useState("");
+  const [formErrorMessage, setFormErrorMessage] = useState("");
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
@@ -48,6 +51,9 @@ const Auth = () => {
       setEmailError(false);
       setEmailHelper("");
     }
+
+    // Clear global error if all fields are valid
+    if (isFormValid()) setFormErrorMessage("");
   };
 
   const isValidEmail = (email) => {
@@ -73,6 +79,7 @@ const Auth = () => {
       email: "",
       password: "",
     });
+    setFormErrorMessage(""); // Clear error message on toggle
   };
 
   const handleDialogClose = () => {
@@ -81,21 +88,76 @@ const Auth = () => {
   };
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (!passwordRegex.test(value)) {
-      setPasswordError(true);
-      setHelperText("Min 8 chars with upper, lower, number & special char");
-    } else {
-      setPasswordError(false);
-      setHelperText("");
+    if (name === "password") {
+      if (!passwordRegex.test(value)) {
+        setPasswordError(true);
+        setHelperText("Min 8 chars with upper, lower, number & special char");
+      } else {
+        setPasswordError(false);
+        setHelperText("");
+      }
     }
+
+    // Clear global error if all fields are valid
+    if (isFormValid()) setFormErrorMessage("");
+  };
+
+  const isFormValid = () => {
+    return (
+      formData.firstname.trim() &&
+      formData.lastname.trim() &&
+      isValidEmail(formData.email) &&
+      passwordRegex.test(formData.password)
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let hasError = false;
+
+    // Reset form-level error message
+    setFormErrorMessage("");
+
+    // Validate required fields manually
+    if (
+      isRegister &&
+      (!formData.firstname.trim() || !formData.lastname.trim())
+    ) {
+      hasError = true;
+    }
+
+    if (!formData.email.trim()) {
+      setEmailError(true);
+      setEmailHelper("Email is required");
+      hasError = true;
+    } else if (!isValidEmail(formData.email)) {
+      setEmailError(true);
+      setEmailHelper("Enter a valid email (e.g. user@gmail.com)");
+      hasError = true;
+    } else {
+      setEmailError(false);
+      setEmailHelper("");
+    }
+
+    if (!formData.password || !passwordRegex.test(formData.password)) {
+      setPasswordError(true);
+      setHelperText("Min 8 chars with upper, lower, number & special char");
+      hasError = true;
+    } else {
+      setPasswordError(false);
+      setHelperText("");
+    }
+
+    if (hasError) {
+      setFormErrorMessage("Please fix all the errors before submitting.");
+      return;
+    }
+
+    // No errors — submit to API
     const endpoint = isRegister
       ? "http://localhost:5000/api/auth/register"
       : "http://localhost:5000/api/auth/login";
@@ -112,14 +174,8 @@ const Auth = () => {
       if (data.token) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("token", data.token);
-        setIsAuthenticated(true); // ← triggers Header re-render
-
-        if (data.role === "user") {
-          navigate("/");
-        } else if (data.role === "admin") {
-          navigate("/admin");
-        }
-        // Redirect to home
+        setIsAuthenticated(true);
+        navigate(data.role === "admin" ? "/admin" : "/");
       } else {
         if (isRegister) {
           setSuccessDialogOpen(true);
@@ -137,34 +193,17 @@ const Auth = () => {
     <Box
       sx={{
         backgroundImage: `url(${process.env.PUBLIC_URL}/images/banner_2.jpg)`,
-        // backgroundSize: "cover",
         backgroundPosition: "center",
         height: "100vh",
       }}
     >
-      <Container
-        maxWidth="sm"
-        sx={{
-          padding: 20,
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-          }}
-        >
+      <Container maxWidth="sm" sx={{ padding: 20 }}>
+        <Paper elevation={3} sx={{ padding: 4 }}>
           <Typography variant="h5" align="center" gutterBottom>
-            {isRegister ? "Create an Account" : "Login to Carrer Caper"}
+            {isRegister ? "Create an Account" : "Login to Career Caper"}
           </Typography>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              mt: 2,
-            }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             {isRegister && (
               <>
                 <TextField
@@ -172,7 +211,7 @@ const Auth = () => {
                   fullWidth
                   label="First Name"
                   name="firstname"
-                  value={formData?.firstname}
+                  value={formData.firstname}
                   onChange={handleChange}
                   required
                 />
@@ -181,7 +220,7 @@ const Auth = () => {
                   fullWidth
                   label="Last Name"
                   name="lastname"
-                  value={formData?.lastname}
+                  value={formData.lastname}
                   onChange={handleChange}
                   required
                 />
@@ -213,6 +252,17 @@ const Auth = () => {
               error={passwordError}
               helperText={helperText}
             />
+
+            {formErrorMessage && (
+              <Typography
+                color="error"
+                variant="body2"
+                sx={{ mt: 1 }}
+                align="center"
+              >
+                {formErrorMessage}
+              </Typography>
+            )}
 
             <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
               {isRegister ? "Register" : "Login"}

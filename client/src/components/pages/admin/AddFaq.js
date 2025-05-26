@@ -11,13 +11,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormHelperText,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import axios from "axios";
 
 export default function AddFaq() {
   const [technology, setTechnology] = useState("");
+  const [technologyError, setTechnologyError] = useState(false);
   const [questions, setQuestions] = useState([{ question: "", answer: "" }]);
+  const [questionsError, setQuestionsError] = useState("");
 
   const handleQuestionChange = (index, field, value) => {
     const updated = [...questions];
@@ -33,7 +36,36 @@ export default function AddFaq() {
     setQuestions(questions.filter((_, i) => i !== index));
   };
 
+  const validateForm = () => {
+    let valid = true;
+
+    if (!technology.trim()) {
+      setTechnologyError(true);
+      valid = false;
+    } else {
+      setTechnologyError(false);
+    }
+
+    if (questions.length === 0) {
+      setQuestionsError("Please add at least one question and answer.");
+      valid = false;
+    } else {
+      for (let i = 0; i < questions.length; i++) {
+        if (!questions[i].question.trim() || !questions[i].answer.trim()) {
+          setQuestionsError(`Question ${i + 1} and answer cannot be empty.`);
+          valid = false;
+          break;
+        }
+      }
+      if (valid) setQuestionsError("");
+    }
+
+    return valid;
+  };
+
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     try {
       await axios.post("http://localhost:5000/api/faqs", {
         technology,
@@ -52,33 +84,22 @@ export default function AddFaq() {
       <Typography variant="h5" mb={2}>
         Add FAQs
       </Typography>
-      {/* <TextField
-        label="Technology"
-        fullWidth
-        value={technology}
-        onChange={(e) => setTechnology(e.target.value)}
-        margin="normal"
-      /> */}
-      <FormControl fullWidth sx={{ mb: 3 }}>
+
+      <FormControl fullWidth sx={{ mb: 3 }} error={technologyError}>
         <InputLabel>Technology</InputLabel>
         <Select
           value={technology}
           label="Technology"
           onChange={(e) => setTechnology(e.target.value)}
         >
-          <MenuItem key={"java"} value={"java"}>
-            Java
-          </MenuItem>
-          <MenuItem key={"react"} value={"react"}>
-            React
-          </MenuItem>
-          <MenuItem key={"mongodb"} value={"mongodb"}>
-            MongoDB
-          </MenuItem>
-          <MenuItem key={"php"} value={"php"}>
-            PHP
-          </MenuItem>
+          <MenuItem value="java">Java</MenuItem>
+          <MenuItem value="react">React</MenuItem>
+          <MenuItem value="mongodb">MongoDB</MenuItem>
+          <MenuItem value="php">PHP</MenuItem>
         </Select>
+        {technologyError && (
+          <FormHelperText>Technology is required</FormHelperText>
+        )}
       </FormControl>
 
       {questions.map((qa, index) => (
@@ -92,6 +113,7 @@ export default function AddFaq() {
                 handleQuestionChange(index, "question", e.target.value)
               }
               margin="normal"
+              error={questionsError && !qa.question.trim()}
             />
             <TextField
               label="Answer"
@@ -102,6 +124,7 @@ export default function AddFaq() {
                 handleQuestionChange(index, "answer", e.target.value)
               }
               margin="normal"
+              error={questionsError && !qa.answer.trim()}
             />
             <IconButton
               onClick={() => removeQuestion(index)}
@@ -112,6 +135,12 @@ export default function AddFaq() {
           </CardContent>
         </Card>
       ))}
+
+      {questionsError && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {questionsError}
+        </Typography>
+      )}
 
       <Button startIcon={<Add />} onClick={addQuestion} sx={{ mb: 2 }}>
         Add Another Question
