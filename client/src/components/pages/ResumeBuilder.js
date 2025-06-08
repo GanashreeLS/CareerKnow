@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Button,
@@ -9,6 +9,7 @@ import {
   Box,
   Typography,
   Autocomplete,
+  FormHelperText,
 } from "@mui/material";
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
@@ -31,6 +32,7 @@ const SKILL_OPTIONS = [
 const ResumeBuilder = () => {
   const [candidateType, setCandidateType] = useState("fresher");
   const [format, setFormat] = useState("pdf");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,25 +41,29 @@ const ResumeBuilder = () => {
     skills: [],
   });
 
-  useEffect(() => {
-    if (candidateType === "fresher") {
-      setFormData({
-        name: "John Doe",
-        email: "john@example.com",
-        education: "B.Tech in Computer Science, 2024",
-        experience: "Completed internship at ABC Tech.",
-        skills: ["Java", "React", "HTML", "CSS"],
-      });
-    } else {
-      setFormData({
-        name: "Jane Smith",
-        email: "jane@example.com",
-        education: "B.Tech in Computer Science, 2018",
-        experience: "5 years experience as Full Stack Developer at XYZ Corp.",
-        skills: ["Java", "Spring Boot", "React", "AWS"],
-      });
+  const [errors, setErrors] = useState({});
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Invalid email format";
     }
-  }, [candidateType]);
+    if (!formData.education.trim())
+      newErrors.education = "Education is required";
+    if (!formData.experience.trim())
+      newErrors.experience = "Experience is required";
+    if (formData.skills.length === 0)
+      newErrors.skills = "Please select at least one skill";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -69,35 +75,40 @@ const ResumeBuilder = () => {
 
   const generatePDF = () => {
     const doc = new jsPDF();
-    let y = 10;
+    const margin = 20;
+    let y = margin;
+
+    doc.setLineWidth(2);
+    doc.rect(10, 10, 190, 277);
 
     doc.setFontSize(18);
-    doc.text(formData.name, 10, y);
+    doc.text(formData.name, margin + 5, y);
     y += 10;
 
     doc.setFontSize(12);
-    doc.text(`${formData.email}`, 10, y);
+    doc.text(formData.email, margin + 5, y);
     y += 10;
 
     doc.setFont("helvetica", "bold");
-    doc.text("Education", 10, y);
-    doc.setFont("helvetica", "normal");
+    doc.text("Education", margin + 5, y);
     y += 7;
-    doc.text(formData.education, 10, y);
-    y += 10;
+    doc.setFont("helvetica", "normal");
+    doc.text(doc.splitTextToSize(formData.education, 180), margin + 5, y);
+    y += 15;
 
     doc.setFont("helvetica", "bold");
-    doc.text("Experience", 10, y);
-    doc.setFont("helvetica", "normal");
+    doc.text("Experience", margin + 5, y);
     y += 7;
-    doc.text(doc.splitTextToSize(formData.experience, 180), 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(doc.splitTextToSize(formData.experience, 180), margin + 5, y);
     y += 20;
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Skills", 10, y);
     doc.setFont("helvetica", "normal");
+    doc.text(formData.skills.join(", "), margin + 5, y);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Skills", margin + 5, y);
     y += 7;
-    doc.text(formData.skills.join(", "), 10, y);
 
     doc.save("resume.pdf");
   };
@@ -106,35 +117,62 @@ const ResumeBuilder = () => {
     const doc = new Document({
       sections: [
         {
+          properties: {
+            page: {
+              borderTop: { style: "single", size: 24, color: "000000" },
+              borderBottom: { style: "single", size: 24, color: "000000" },
+              borderLeft: { style: "single", size: 24, color: "000000" },
+              borderRight: { style: "single", size: 24, color: "000000" },
+              margin: {
+                top: 720,
+                bottom: 720,
+                left: 720,
+                right: 720,
+              },
+            },
+          },
           children: [
             new Paragraph({
+              spacing: { after: 200 },
               children: [
                 new TextRun({ text: formData.name, bold: true, size: 28 }),
               ],
             }),
-            new Paragraph(formData.email),
+            new Paragraph({
+              spacing: { after: 200 },
+              children: [new TextRun({ text: formData.email, size: 24 })],
+            }),
             new Paragraph(""),
 
             new Paragraph({
+              spacing: { after: 100 },
               children: [
-                new TextRun({ text: "Education", bold: true, size: 24 }),
+                new TextRun({ text: "Education", bold: true, size: 26 }),
               ],
             }),
-            new Paragraph(formData.education),
-            new Paragraph(""),
+            new Paragraph({
+              text: formData.education,
+              spacing: { after: 300 },
+            }),
+            new Paragraph({
+              spacing: { after: 100 },
+              children: [new TextRun({ text: "Skills", bold: true, size: 26 })],
+            }),
+            new Paragraph({
+              text: formData.skills.join(", "),
+              spacing: { after: 100 },
+            }),
 
             new Paragraph({
+              spacing: { after: 100 },
               children: [
-                new TextRun({ text: "Experience", bold: true, size: 24 }),
+                new TextRun({ text: "Experience", bold: true, size: 26 }),
               ],
             }),
-            new Paragraph(formData.experience),
-            new Paragraph(""),
-
             new Paragraph({
-              children: [new TextRun({ text: "Skills", bold: true, size: 24 })],
+              text: formData.experience,
+              spacing: { after: 300 },
             }),
-            new Paragraph(formData.skills.join(", ")),
           ],
         },
       ],
@@ -145,16 +183,22 @@ const ResumeBuilder = () => {
   };
 
   const handleGenerate = () => {
-    format === "pdf" ? generatePDF() : generateWord();
+    if (validateFields()) {
+      format === "pdf" ? generatePDF() : generateWord();
+    }
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ textAlign: "center", padding: "0.5em" }}
-      >
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        mt: 4,
+        p: 3,
+        bgcolor: "white",
+      }}
+    >
+      <Typography variant="h4" gutterBottom textAlign="center" p={1}>
         Resume Builder
       </Typography>
 
@@ -177,7 +221,10 @@ const ResumeBuilder = () => {
         onChange={handleInputChange}
         fullWidth
         margin="normal"
+        error={!!errors.name}
+        helperText={errors.name}
       />
+
       <TextField
         label="Email"
         name="email"
@@ -185,7 +232,10 @@ const ResumeBuilder = () => {
         onChange={handleInputChange}
         fullWidth
         margin="normal"
+        error={!!errors.email}
+        helperText={errors.email}
       />
+
       <TextField
         label="Education"
         name="education"
@@ -193,7 +243,10 @@ const ResumeBuilder = () => {
         onChange={handleInputChange}
         fullWidth
         margin="normal"
+        error={!!errors.education}
+        helperText={errors.education}
       />
+
       <TextField
         label="Experience"
         name="experience"
@@ -201,14 +254,23 @@ const ResumeBuilder = () => {
         onChange={handleInputChange}
         fullWidth
         margin="normal"
+        error={!!errors.experience}
+        helperText={errors.experience}
       />
+
       <Autocomplete
         multiple
         options={SKILL_OPTIONS}
         value={formData.skills}
         onChange={handleSkillsChange}
         renderInput={(params) => (
-          <TextField {...params} label="Skills" margin="normal" />
+          <TextField
+            {...params}
+            label="Skills"
+            margin="normal"
+            error={!!errors.skills}
+            helperText={errors.skills}
+          />
         )}
         fullWidth
       />

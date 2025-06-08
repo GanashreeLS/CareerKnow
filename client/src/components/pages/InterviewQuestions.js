@@ -54,7 +54,7 @@ const FAQInterview = () => {
   //     },
   //     {
   //       question: "Difference between equals() and ==?",
-  //       answer: "equals() compares content, == compares references.",
+  //       answer: "Equals() compares content, == compares references.",
   //     },
   //     {
   //       question: "What is an interface?",

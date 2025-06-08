@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Typography,
@@ -8,32 +8,52 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Autocomplete,
   Stack,
+  FormHelperText,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Recommend() {
   const [answers, setAnswers] = useState({
-    interest: [],
+    interest: "",
     skills: "",
     salary: "",
     location: "",
     worktype: "",
-  }); // { interest: 'java', skills: 'react' }
+  });
+
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    const res = await axios.post(
-      "http://localhost:5000/api/recommend",
-      answers
-    ); // calling backend api
-    localStorage.setItem("careerResults", JSON.stringify(res.data));
-    navigate("/results");
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!answers.interest) newErrors.interest = "Interest is required";
+    if (!answers.skills) newErrors.skills = "Skills are required";
+    if (!answers.salary) newErrors.salary = "Salary is required";
+    if (!answers.location) newErrors.location = "Location is required";
+    if (!answers.worktype) newErrors.worktype = "Work type is required";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
-  // useEffect(() => { alert("component loaded")}, []);
+  const handleSubmit = async () => {
+    if (!validateFields()) return;
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/recommend",
+        answers
+      );
+      localStorage.setItem("careerResults", JSON.stringify(res.data));
+      navigate("/results");
+    } catch (err) {
+      console.error("API error:", err);
+    }
+  };
 
   return (
     <Container
@@ -43,10 +63,9 @@ function Recommend() {
         Career Recommendations
       </Typography>
 
-      {/* <TextField label="Interests" fullWidth margin="normal" onChange={e => setAnswers({ ...answers, interest: e.target.value })} /> */}
-
       <Stack spacing={2} width={"40vw"} sx={{ margin: "0 auto" }}>
-        <FormControl fullWidth>
+        {/* Interest */}
+        <FormControl fullWidth error={!!errors.interest}>
           <InputLabel id="interests-label">Interests</InputLabel>
           <Select
             labelId="interests-label"
@@ -63,25 +82,11 @@ function Recommend() {
             <MenuItem value={"Digital Marketing"}>Digital Marketing</MenuItem>
             <MenuItem value={"Project Management"}>Project Management</MenuItem>
           </Select>
+          <FormHelperText>{errors.interest}</FormHelperText>
         </FormControl>
-        {/* <FormControl fullWidth className="form-field">
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={interests}
-            getOptionLabel={(option) => option.title}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Interests"
-                placeholder="Interests"
-              />
-            )}
-          />
-        </FormControl> */}
 
-        <FormControl fullWidth className="form-field">
+        {/* Skills */}
+        <FormControl fullWidth error={!!errors.skills}>
           <InputLabel id="skills-label">Skills</InputLabel>
           <Select
             labelId="skills-label"
@@ -94,9 +99,11 @@ function Recommend() {
             <MenuItem value={"sql"}>SQL</MenuItem>
             <MenuItem value={"python"}>Python</MenuItem>
           </Select>
+          <FormHelperText>{errors.skills}</FormHelperText>
         </FormControl>
 
-        <FormControl fullWidth className="form-field">
+        {/* Salary */}
+        <FormControl fullWidth error={!!errors.salary}>
           <InputLabel id="salary-label">Salary (INR)</InputLabel>
           <Select
             labelId="salary-label"
@@ -109,8 +116,11 @@ function Recommend() {
             <MenuItem value={"350000-450000"}>350000-450000</MenuItem>
             <MenuItem value={"450000-550000"}>450000-550000</MenuItem>
           </Select>
+          <FormHelperText>{errors.salary}</FormHelperText>
         </FormControl>
-        <FormControl fullWidth className="form-field">
+
+        {/* Location */}
+        <FormControl fullWidth error={!!errors.location}>
           <InputLabel id="location-label">Location</InputLabel>
           <Select
             labelId="location-label"
@@ -125,9 +135,12 @@ function Recommend() {
             <MenuItem value={"Chennai"}>Chennai</MenuItem>
             <MenuItem value={"Hyderabad"}>Hyderabad</MenuItem>
           </Select>
+          <FormHelperText>{errors.location}</FormHelperText>
         </FormControl>
-        <FormControl fullWidth className="form-field">
-          <InputLabel id="salary-label">Work Type</InputLabel>
+
+        {/* Work Type */}
+        <FormControl fullWidth error={!!errors.worktype}>
+          <InputLabel id="worktype-label">Work Type</InputLabel>
           <Select
             labelId="worktype-label"
             id="worktype-select"
@@ -141,6 +154,7 @@ function Recommend() {
             <MenuItem value={"On Site"}>On Site</MenuItem>
             <MenuItem value={"Remote"}>Remote</MenuItem>
           </Select>
+          <FormHelperText>{errors.worktype}</FormHelperText>
         </FormControl>
 
         <Button variant="contained" onClick={handleSubmit}>
@@ -150,13 +164,5 @@ function Recommend() {
     </Container>
   );
 }
-
-const interests = [
-  { title: "Development", year: 1994 },
-  { title: "Testing", year: 1972 },
-  { title: "DevOps", year: 1974 },
-  { title: "Data Analyst", year: 2008 },
-  { title: "Data Engineer", year: 1957 },
-];
 
 export default Recommend;

@@ -4,14 +4,13 @@ body {
   font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
     "Helvetica Neue", sans-serif;
 }
-
-.app-background {
-  background-image: url("/images/banner_1.jpg"); /* use import if from src */
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  min-height: 100vh;
+#root {
+  /* height: max-content; */
+  background-color: lightblue;
+  min-height: calc(100vh + 5em); /* if content is smaller than the viewport */
+  padding-bottom: 5em;
 }
+
 .form-field {
   padding: "10rem";
 }

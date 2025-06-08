@@ -188,6 +188,7 @@ const Auth = () => {
       alert("Server error.");
     }
   };
+  const isValid = (text) => /^[A-Za-z ]+$/.test(text);
 
   return (
     <Box
@@ -213,6 +214,14 @@ const Auth = () => {
                   name="firstname"
                   value={formData.firstname}
                   onChange={handleChange}
+                  error={
+                    formData.firstname !== "" && !isValid(formData.firstname)
+                  }
+                  helperText={
+                    formData.firstname !== "" && !isValid(formData.firstname)
+                      ? "Only alphabets are allowed"
+                      : ""
+                  }
                   required
                 />
                 <TextField
@@ -222,6 +231,14 @@ const Auth = () => {
                   name="lastname"
                   value={formData.lastname}
                   onChange={handleChange}
+                  error={
+                    formData.lastname !== "" && !isValid(formData.lastname)
+                  }
+                  helperText={
+                    formData.lastname !== "" && !isValid(formData.lastname)
+                      ? "Only alphabets are allowed"
+                      : ""
+                  }
                   required
                 />
               </>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
+import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/pages/Home";
 import Recommend from "./components/pages/Recommend";
@@ -16,7 +17,6 @@ import ResumeBuilder from "./components/pages/ResumeBuilder";
 import InterviewQuestions from "./components/pages/InterviewQuestions";
 import CourseList from "./components/pages/CourseList";
 import AdminHome from "./components/pages/admin/AdminHome";
-import { Container } from "@mui/material";
 import { AuthContext } from "./AuthContext";
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: "lightblue" }}>
+    <div>
       <Router>
         {isUser() && <Header />}
         <Routes>
