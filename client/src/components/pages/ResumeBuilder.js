@@ -103,13 +103,14 @@ const ResumeBuilder = () => {
     doc.text(doc.splitTextToSize(formData.experience, 180), margin + 5, y);
     y += 20;
 
-    doc.setFont("helvetica", "normal");
-    doc.text(formData.skills.join(", "), margin + 5, y);
-
     doc.setFont("helvetica", "bold");
     doc.text("Skills", margin + 5, y);
     y += 7;
 
+    doc.setFont("helvetica", "normal");
+    const skillText = doc.splitTextToSize(formData.skills.join(", "), 180);
+    doc.text(skillText, margin + 5, y);
+    y += skillText.length * 7;
     doc.save("resume.pdf");
   };
 
