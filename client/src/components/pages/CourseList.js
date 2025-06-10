@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -12,38 +12,29 @@ import {
   Grid,
   Link,
 } from "@mui/material";
+import axios from "axios";
 
-const courseData = {
-  Java: [
-    { title: "Java Full Course for Beginners", id: "8cm1x4bC610" },
-    { title: "Java Tutorial for Beginners", id: "grEKMHGYyns" },
-    {
-      title: "Java Object-Oriented Programming (OOP) Concepts",
-      id: "Hl-zzrqQoSE",
-    },
-    { title: "Java OOP Concepts Tutorial", id: "pTB0EiLXUC8" },
-    { title: "Java OOP Concepts Explained", id: "n60Dn0UsbEk" },
-    { title: "Java OOP Concepts with Examples", id: "sTX0UEplF54" },
-  ],
-  React: [
-    { title: "React JS Full Course 2024", id: "bMknfKXIFA8" },
-    { title: "React Hooks Tutorial", id: "-MlNBTSg_Ww" },
-    { title: "React Crash Course", id: "w7ejDZ8SWv8" },
-  ],
-  MongoDB: [
-    { title: "MongoDB Tutorial", id: "ofme2o29ngU" },
-    { title: "MongoDB in 1 Hour", id: "YS4e4q9oBaU" },
-    { title: "MongoDB Crash Course", id: "FwMwO8pXfq0" },
-  ],
-  PHP: [
-    { title: "PHP Full Course", id: "OK_JCtrrv-c" },
-    { title: "PHP in Hindi", id: "1SnPKhCdlsU" },
-    { title: "PHP for Beginners", id: "z0n1aQ3IxWI" },
-  ],
-};
+const technologies = ["Java", "React", "MongoDB", "PHP"];
 
 const CourseList = () => {
   const [selectedTech, setSelectedTech] = useState("Java");
+  const [courses, setCourses] = useState([]);
+
+  const fetchCourses = async (technology) => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/courses", {
+        params: { technology },
+      });
+      setCourses(res.data);
+    } catch (err) {
+      console.error("Failed to fetch courses", err);
+      setCourses([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses(selectedTech);
+  }, [selectedTech]);
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", mt: 4, p: 3, bgcolor: "white" }}>
@@ -62,7 +53,7 @@ const CourseList = () => {
           label="Technology"
           onChange={(e) => setSelectedTech(e.target.value)}
         >
-          {Object.keys(courseData).map((tech) => (
+          {technologies.map((tech) => (
             <MenuItem key={tech} value={tech}>
               {tech}
             </MenuItem>
@@ -71,30 +62,36 @@ const CourseList = () => {
       </FormControl>
 
       <Grid container spacing={3}>
-        {courseData[selectedTech].map((course, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ height: "100%" }}>
-              <Link
-                href={`https://www.youtube.com/watch?v=${course.id}`}
-                target="_blank"
-                rel="noopener"
-                underline="none"
-              >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={`https://img.youtube.com/vi/${course.id}/hqdefault.jpg`}
-                  alt={course.title}
-                />
-                <CardContent>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {course.title}
-                  </Typography>
-                </CardContent>
-              </Link>
-            </Card>
-          </Grid>
-        ))}
+        {courses.length === 0 ? (
+          <Typography variant="body1" sx={{ ml: 2 }}>
+            No courses found for {selectedTech}.
+          </Typography>
+        ) : (
+          courses.map((course, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card sx={{ height: "100%" }}>
+                <Link
+                  href={`https://www.youtube.com/watch?v=${course.youtubeId}`}
+                  target="_blank"
+                  rel="noopener"
+                  underline="none"
+                >
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={`https://img.youtube.com/vi/${course.youtubeId}/hqdefault.jpg`}
+                    alt={course.title}
+                  />
+                  <CardContent>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {course.title}
+                    </Typography>
+                  </CardContent>
+                </Link>
+              </Card>
+            </Grid>
+          ))
+        )}
       </Grid>
     </Box>
   );

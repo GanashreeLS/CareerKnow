@@ -4,6 +4,7 @@ import AddFaq from "./AddFaq";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../../utils/auth";
 import UserList from "./UserList";
+import AdminCourseManager from "./AdminCourseManager";
 export default function AdminHome() {
   const [view, setView] = useState("home");
   const [users, setUsers] = useState([]);
@@ -47,6 +48,9 @@ export default function AdminHome() {
           <Button color="inherit" onClick={() => setView("add-faq")}>
             Add FAQs
           </Button>
+          <Button color="inherit" onClick={() => setView("manage-courses")}>
+            Manage Courses
+          </Button>
           <Button color="inherit" onClick={() => setView("user-list")}>
             Manage Users
           </Button>
@@ -66,6 +70,8 @@ export default function AdminHome() {
         {view === "add-faq" && <AddFaq />}
 
         {view === "user-list" && <UserList />}
+
+        {view === "manage-courses" && <AdminCourseManager />}
       </Box>
     </Box>
   );
