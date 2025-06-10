@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -12,6 +12,7 @@ import {
   Select,
   MenuItem,
   FormHelperText,
+  Divider,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import axios from "axios";
@@ -21,6 +22,30 @@ export default function AddFaq() {
   const [technologyError, setTechnologyError] = useState(false);
   const [questions, setQuestions] = useState([{ question: "", answer: "" }]);
   const [questionsError, setQuestionsError] = useState("");
+  const [existingFaqs, setExistingFaqs] = useState([]);
+
+  // Fetch FAQs for selected technology
+  useEffect(() => {
+    if (technology) {
+      fetchFaqs();
+    }
+  }, [technology]);
+
+  const fetchFaqs = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/faqs/${technology}`
+      );
+      if (res.data && res.data?.questions) {
+        setExistingFaqs(res.data?.questions || []);
+      } else {
+        setExistingFaqs([]); // No FAQs for selected technology
+      }
+    } catch (err) {
+      console.error("Error fetching FAQs", err);
+      setExistingFaqs([]);
+    }
+  };
 
   const handleQuestionChange = (index, field, value) => {
     const updated = [...questions];
@@ -46,20 +71,15 @@ export default function AddFaq() {
       setTechnologyError(false);
     }
 
-    if (questions.length === 0) {
-      setQuestionsError("Please add at least one question and answer.");
-      valid = false;
-    } else {
-      for (let i = 0; i < questions.length; i++) {
-        if (!questions[i].question.trim() || !questions[i].answer.trim()) {
-          setQuestionsError(`Question ${i + 1} and answer cannot be empty.`);
-          valid = false;
-          break;
-        }
+    for (let i = 0; i < questions.length; i++) {
+      if (!questions[i].question.trim() || !questions[i].answer.trim()) {
+        setQuestionsError(`Question ${i + 1} or answer is empty.`);
+        valid = false;
+        break;
       }
-      if (valid) setQuestionsError("");
     }
 
+    if (valid) setQuestionsError("");
     return valid;
   };
 
@@ -72,10 +92,24 @@ export default function AddFaq() {
         questions,
       });
       alert("FAQ added successfully!");
-      setTechnology("");
       setQuestions([{ question: "", answer: "" }]);
+      fetchFaqs(); // Refresh list
     } catch (error) {
       alert("Error adding FAQ.");
+    }
+  };
+
+  const handleDelete = async (index) => {
+    try {
+      const updatedFaqs = [...existingFaqs];
+      updatedFaqs.splice(index, 1);
+      await axios.put("http://localhost:5000/api/faqs", {
+        technology,
+        questions: updatedFaqs,
+      });
+      setExistingFaqs(updatedFaqs);
+    } catch (err) {
+      console.error("Error deleting FAQ");
     }
   };
 
@@ -113,7 +147,7 @@ export default function AddFaq() {
                 handleQuestionChange(index, "question", e.target.value)
               }
               margin="normal"
-              error={questionsError && !qa.question.trim()}
+              error={!qa.question.trim() && !!questionsError}
             />
             <TextField
               label="Answer"
@@ -124,7 +158,7 @@ export default function AddFaq() {
                 handleQuestionChange(index, "answer", e.target.value)
               }
               margin="normal"
-              error={questionsError && !qa.answer.trim()}
+              error={!qa.answer.trim() && !!questionsError}
             />
             <IconButton
               onClick={() => removeQuestion(index)}
@@ -149,6 +183,35 @@ export default function AddFaq() {
       <Button variant="contained" onClick={handleSubmit}>
         Submit
       </Button>
+
+      {existingFaqs.length > 0 && (
+        <>
+          <Divider sx={{ my: 4 }} />
+          <Typography variant="h6" gutterBottom>
+            Existing FAQs for {technology}
+          </Typography>
+          {existingFaqs.map((qa, index) => (
+            <Card key={index} variant="outlined" sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1">
+                  Question{index + 1}: {qa.question}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Answer: {qa.answer}
+                </Typography>
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(index)}
+                  startIcon={<Delete />}
+                >
+                  Delete
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </>
+      )}
     </Box>
   );
 }

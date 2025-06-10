@@ -31,6 +31,18 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/:technology", async (req, res) => {
+  try {
+    console.log(req.params.technology);
+    const faq = await Faq.findOne({ technology: req.params.technology });
+    if (!faq) return res.status(404).json({ message: "FAQ not found" });
+    res.json(faq);
+  } catch (error) {
+    console.error("Error fetching filtered FAQs:", error);
+    res.status(500).json({ error: "Failed to fetch FAQs" });
+  }
+});
+
 router.get("/", async (req, res) => {
   try {
     const faqs = await Faq.find();
@@ -41,16 +53,30 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:technology", async (req, res) => {
+router.put("/", async (req, res) => {
+  const { technology, questions } = req.body;
+
+  if (!technology || !Array.isArray(questions)) {
+    return res.status(400).json({ message: "Invalid request data." });
+  }
+
   try {
-    const technology = req.params.technology;
-    const faqs = await Faq.find({
-      technology: new RegExp(`^${technology}$`, "i"),
-    }); // case-insensitive
-    res.json(faqs);
-  } catch (error) {
-    console.error("Error fetching filtered FAQs:", error);
-    res.status(500).json({ error: "Failed to fetch FAQs" });
+    const updatedFaq = await Faq.findOneAndUpdate(
+      { technology },
+      { $set: { questions } },
+      { new: true, upsert: false } // Do not create new if not found
+    );
+
+    if (!updatedFaq) {
+      return res
+        .status(404)
+        .json({ message: "FAQ not found for given technology." });
+    }
+
+    res.json({ message: "FAQ updated successfully", faq: updatedFaq });
+  } catch (err) {
+    console.error("Error updating FAQ:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 module.exports = router;
